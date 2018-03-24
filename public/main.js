@@ -1,43 +1,50 @@
 const foundIDs = [];
 const leaderInfo = [];
 const API_KEY = "34374832f4d2a48753f354e125a4bf";
+let zipInput;
+let radInput;
+let countInput;
 
-const zip = 33556;
-const radius = 5;
+let zip = 33556;
+let radius = 5;
+const params = {
+  zipCode: zip,
+  distRadius: radius,
+  count: 3
+};
 
 const main = () => {
-  // document.querySelector('h1').textContent += '?'
-//   fetch('https://api.meetup.com/find/groups?key=34374832f4d2a48753f354e125a4bf&sign=true&photo-host=public&page=20',
-// {
-//   mode: 'no-cors',
-// })
-//   .then((response) => {
-//     console.log(response);
-//     if(response.status === 200) {
-//       console.log(response);
-//       return response.json();
-//     } else {
-//       console.log(response); 
-//     }
-//   },
-// )
-//   .then((data) => {
-//     console.log(data);
-//   });
-  getGroups(zip, radius, 5);
+  zipInput = document.querySelector(".zipCode");
+  radInput = document.querySelector(".radius");
+  countInput = document.querySelector(".count");
 
+  console.log(zipInput, radInput, countInput);
+
+  // getGroups(params);
+  console.log(leaderInfo);
 }
 
-const getGroups = (zipCode, distRadius, count) => {
+const locationSearch = (event) => {
+  console.log("button was clicked!");
+  console.log(`zip: ${zipInput.value}, radius: ${radInput.value}, count: ${countInput.value}`);
+  params.zipCode = zipInput.value;
+  params.distRadius = radInput.value;
+  params.count = countInput.value;
+  getGroups(params);
+}
+
+const getGroups = (paramsObj) => {
+  console.log(paramsObj);
+  const searchUrl = `https://api.meetup.com/find/groups?key=${API_KEY}&sign=true&photo-host=public${paramsObj.zipCode ? `&zip=${paramsObj.zipCode}` : ""}${paramsObj.distRadius ? `&radius=${paramsObj.distRadius}` : ""}${ paramsObj.count ? `&page=${paramsObj.count}` : "&page=40"}`;
+  console.log(searchUrl);
   $.ajax({ 
     type:"GET", // GET = requesting data
-    url:`https://api.meetup.com/find/groups?key=${API_KEY}&sign=true&photo-host=public${zipCode ? `&zip=${zipCode}` : ""}${distRadius ? `&radius=${distRadius}` : ""}${ count ? `&page=${count}` : "&page=40"}`, 
+    url: searchUrl, 
     success: function(data) { 
       console.log(data);
       data.data.forEach((group) => {
         foundIDs.push(group.organizer.id);
       });
-      // $('.tag-1').text(JSON.stringify(data.data[0].organizer.id, undefined, 2)); // Set data that comes back from the server to 'text'
     },
     // error: function()
     dataType: 'jsonp',
